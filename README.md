@@ -73,6 +73,15 @@ terraform destroy
 keep_locally(Boolean) Если true, образ Docker не будет удален при операции уничтожения. Если это значение false, оно удалит изображение из локального хранилища докера при операции уничтожения.
 На практике подтвердилось
 
+Lesson_2*
+1) Создал ВМ через web интерфейс
+   ![image](https://github.com/AntonStogov/netology_terraform/assets/97850376/182f19fb-38da-4439-ae24-6dbad37072b6)
+2) ssh testad@158.160.118.186
+выполнил подключение к виртуальной машине
+testad@test1:~$ docker -v
+Docker version 25.0.1, build 29cf629
+установил docker
+
 
 
 
