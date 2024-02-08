@@ -15,6 +15,7 @@ yc resource-manager folder add-access-binding \
 yc iam key create \
    --service-account-name <sa_name> \
    --output key.json
+
 3)Сгенерируйте новый или используйте свой текущий ssh-ключ. Запишите его открытую(public) часть в переменную vms_ssh_public_root_key
 Ответ: сгенерировал ключ с помощью команды:
 ssh-keygen -t ed25519
