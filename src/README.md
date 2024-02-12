@@ -63,6 +63,41 @@ vm_info = {
 
 Ответ: в качестве ответа загрузил locals.tf
 
+ЗАДАНИЕ 6:
+1. Вместо использования трёх переменных  ".._cores",".._memory",".._core_fraction" в блоке  resources {...}, объедините их в единую map-переменную **vms_resources** и  внутри неё конфиги обеих ВМ в виде вложенного map.  
+   ```
+   пример из terraform.tfvars:
+   vms_resources = {
+     web={
+       cores=
+       memory=
+       core_fraction=
+       ...
+     },
+     db= {
+       cores=
+       memory=
+       core_fraction=
+       ...
+     }
+   }
+   ```
+3. Создайте и используйте отдельную map переменную для блока metadata, она должна быть общая для всех ваших ВМ.
+   ```
+   пример из terraform.tfvars:
+   metadata = {
+     serial-port-enable = 1
+     ssh-keys           = "ubuntu:ssh-ed25519 AAAAC..."
+   }
+   ```  
+  
+5. Найдите и закоментируйте все, более не используемые переменные проекта.
+6. Проверьте terraform plan. Изменений быть не должно.
+
+Ответ:
+![image](https://github.com/AntonStogov/netology_terraform/assets/97850376/66ac060a-1cec-4468-9c95-440070a42919)
+
+
 
 
 
