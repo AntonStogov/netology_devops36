@@ -41,7 +41,7 @@
     Ответ: сервису выгодно в плане ресурсов, нам же выгодно потому что стоимость поддержания такой вм в разы снижается
 
 ```
-![image](https://github.com/AntonStogov/netology_terraform/assets/97850376/60856b42-bf56-4b9f-a446-c55481836615)
+[Скриншот 1](https://github.com/AntonStogov/netology_terraform/assets/97850376/60856b42-bf56-4b9f-a446-c55481836615)
 ```
 ---
 ```
