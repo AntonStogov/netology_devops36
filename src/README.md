@@ -5,26 +5,30 @@
 2. Создайте сервисный аккаунт и ключ. service_account_key_file. 
 
     Ответ: создал сервисный аккаунт 
-    ___
+```
     yc iam service-account create 
     
     --name=<sa_name> 
     
     --description=""
-    ___
+
+    
     yc resource-manager folder add-access-binding
     
     --name <folder_name>
     
     --role <role_name>
+
     
     --service-account-name <sa_name>
-    ___
+
+    
     yc iam key create
     
     --service-account-name <sa_name>
     
     --output key.json
+```
 
 3. Сгенерируйте новый или используйте свой текущий ssh-ключ. Запишите его открытую(public) часть в переменную vms_ssh_public_root_key 
     
@@ -40,38 +44,43 @@
     
     Ответ: сервису выгодно в плане ресурсов, нам же выгодно потому что стоимость поддержания такой вм в разы снижается
 
-
-- ![image](https://github.com/AntonStogov/netology_terraform/assets/97850376/60856b42-bf56-4b9f-a446-c55481836615)
+![image](https://github.com/AntonStogov/netology_terraform/assets/97850376/60856b42-bf56-4b9f-a446-c55481836615)
 
 ---
 
-- ![image](https://github.com/AntonStogov/netology_terraform/assets/97850376/18aa2d66-bafb-4348-b3d0-3fb22b5f871f)
+![image](https://github.com/AntonStogov/netology_terraform/assets/97850376/18aa2d66-bafb-4348-b3d0-3fb22b5f871f)
 
 ---
 
 # Задание №2
 - Замените все хардкод-значения для ресурсов yandex_compute_image и yandex_compute_instance на отдельные переменные. К названиям переменных ВМ добавьте в начало префикс vm_web_ . Пример: vm_web_name. Объявите нужные переменные в файле variables.tf, обязательно указывайте тип переменной. Заполните их default прежними значениями из main.tf. Проверьте terraform plan. Изменений быть не должно.README.md
 
-
     - Ответ: terraform plan
     No changes. Your infrastructure matches the configuration.
     variables.tf загрузил на github
+---
 
-ЗАДАНИЕ 3:
+# Задание № 3
+    
 1. Создайте в корне проекта файл 'vms_platform.tf' . Перенесите в него все переменные первой ВМ.
+
 2. Скопируйте блок ресурса и создайте с его помощью вторую ВМ в файле main.tf: **"netology-develop-platform-db"** ,  ```cores  = 2, memory = 2, core_fraction = 20```. Объявите её переменные с префиксом **vm_db_** в том же файле ('vms_platform.tf').  ВМ должна работать в зоне "ru-central1-b"
+    
 3. Примените изменения.
 
 Ответ:
 ![image](https://github.com/AntonStogov/netology_terraform/assets/97850376/38ae073c-01fc-4d07-841f-2b2b34cff8cf)
+---
 
-ЗАДАНИЕ 4:
+# Задание №4
 1. Объявите в файле outputs.tf **один** output , содержащий: instance_name, external_ip, fqdn для каждой из ВМ в удобном лично для вас формате.
+   
 2. Примените изменения.
 
-В качестве решения приложите вывод значений ip-адресов команды ```terraform output```.
+    В качестве решения приложите вывод значений ip-адресов команды ```terraform output```.
 
-Ответ:
+    Ответ:
+```
 sysad@sysad-home:~/github/terraform/homework/lesson2/02/src$ terraform output 
 vm_info = {
   "platform_vm_db" = {
@@ -85,16 +94,24 @@ vm_info = {
     "instance_name" = "netology-develop-platform-web"
   }
 }
-![image](https://github.com/AntonStogov/netology_terraform/assets/97850376/65032cc2-217f-4fb4-901d-5dedf182d23b)
+```
 
-ЗАДАНИЕ 5:
+![image](https://github.com/AntonStogov/netology_terraform/assets/97850376/65032cc2-217f-4fb4-901d-5dedf182d23b)
+---
+
+# Задание №5
+
 1. В файле locals.tf опишите в **одном** local-блоке имя каждой ВМ, используйте интерполяцию ${..} с НЕСКОЛЬКИМИ переменными по примеру из лекции.
+
 2. Замените переменные внутри ресурса ВМ на созданные вами local-переменные.
+
 3. Примените изменения.
 
 Ответ: в качестве ответа загрузил locals.tf
+--- 
 
-ЗАДАНИЕ 6:
+# Задание №6
+
 1. Вместо использования трёх переменных  ".._cores",".._memory",".._core_fraction" в блоке  resources {...}, объедините их в единую map-переменную **vms_resources** и  внутри неё конфиги обеих ВМ в виде вложенного map.  
    ```
    пример из terraform.tfvars:
@@ -123,11 +140,12 @@ vm_info = {
    ```  
   
 5. Найдите и закоментируйте все, более не используемые переменные проекта.
+
 6. Проверьте terraform plan. Изменений быть не должно.
 
 Ответ:
 ![image](https://github.com/AntonStogov/netology_terraform/assets/97850376/66ac060a-1cec-4468-9c95-440070a42919)
-
+---
 
 
 
