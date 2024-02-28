@@ -40,12 +40,13 @@
     
     Ответ: сервису выгодно в плане ресурсов, нам же выгодно потому что стоимость поддержания такой вм в разы снижается
 
-'''
+```
 ![image](https://github.com/AntonStogov/netology_terraform/assets/97850376/60856b42-bf56-4b9f-a446-c55481836615)
-'''
-'''
+```
+---
+```
 ![image](https://github.com/AntonStogov/netology_terraform/assets/97850376/18aa2d66-bafb-4348-b3d0-3fb22b5f871f)
-'''
+```
 
 ЗАДАНИЕ 2: Замените все хардкод-значения для ресурсов yandex_compute_image и yandex_compute_instance на отдельные переменные. К названиям переменных ВМ добавьте в начало префикс vm_web_ . Пример: vm_web_name. Объявите нужные переменные в файле variables.tf, обязательно указывайте тип переменной. Заполните их default прежними значениями из main.tf. Проверьте terraform plan. Изменений быть не должно.README.md
 
