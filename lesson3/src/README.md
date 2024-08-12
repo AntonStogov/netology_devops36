@@ -12,5 +12,5 @@
 3. terraform init, terraform apply
 Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
 ---
-[Скриншот 1](https://github.com/AntonStogov/netology_terraform/blob/main/lesson3/src/Screenshot%202024-08-12%20221645.png?raw=true)
+https://github.com/AntonStogov/netology_terraform/blob/main/lesson3/src/Screenshot%202024-08-12%20221645.png?raw=true
 ---
