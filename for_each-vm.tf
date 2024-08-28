@@ -1,13 +1,11 @@
-// for_each-vm.tf
 data "yandex_compute_image" "ubuntu_db" {
   family = "ubuntu-2004-lts"
 }
 
-// Используйте `ubuntu_db` в этом файле
 resource "yandex_compute_instance" "db" {
   for_each = { for vm in var.each_vm : vm.vm_name => vm }
 
-  name = each.value.vm_name
+  name = "${var.vpc_name}-${each.value.vm_name}"
 
   resources {
     cores  = each.value.cpu
@@ -27,6 +25,6 @@ resource "yandex_compute_instance" "db" {
   }
 
   metadata = {
-  ssh-keys = "ubuntu:${file("/home/sysad_ubuntu/.ssh/id_rsa.pub")}"
-}
+    ssh-keys = "ubuntu:${file("/home/${var.ssh_user}/.ssh/id_rsa.pub")}"
+  }
 }

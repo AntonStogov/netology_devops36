@@ -1,17 +1,15 @@
-// count-vm.tf
 data "yandex_compute_image" "ubuntu_web" {
   family = "ubuntu-2004-lts"
 }
 
-// Используйте `ubuntu_web` в этом файле
 resource "yandex_compute_instance" "web" {
-  count = 2
+  count = var.instance_count
 
-  name = "web-${count.index + 1}"
+  name = "${var.vpc_name}-web-${count.index + 1}"
 
   resources {
-    cores  = 2
-    memory = 2
+    cores  = var.web_instance_type.cores
+    memory = var.web_instance_type.memory
   }
 
   boot_disk {
@@ -23,13 +21,12 @@ resource "yandex_compute_instance" "web" {
   network_interface {
     subnet_id = yandex_vpc_subnet.develop.id
     nat       = true
-
     security_group_ids = [
       yandex_vpc_security_group.example.id
     ]
   }
 
   metadata = {
-  ssh-keys = "ubuntu:${file("/home/sysad_ubuntu/.ssh/id_rsa.pub")}"
-}
+    ssh-keys = "ubuntu:${file("/home/${var.ssh_user}/.ssh/id_rsa.pub")}"
+  }
 }

@@ -1,17 +1,17 @@
 resource "yandex_compute_disk" "storage_disks" {
-  count = 3
+  count = var.storage_disk_count
 
-  name  = "storage-disk-${count.index + 1}"
-  size  = 1
-  type  = "network-hdd"  # Тип диска, можно изменить при необходимости
+  name  = "${var.storage_instance_name}-disk-${count.index + 1}"
+  size  = var.storage_disk_size
+  type  = var.storage_disk_type
 }
 
 resource "yandex_compute_instance" "storage" {
-  name = "storage"
+  name = var.storage_instance_name
 
   resources {
-    cores  = 2
-    memory = 2
+    cores  = var.storage_instance_resources.cores
+    memory = var.storage_instance_resources.memory
   }
 
   boot_disk {
@@ -34,8 +34,8 @@ resource "yandex_compute_instance" "storage" {
   }
 
   metadata = {
-  ssh-keys = "ubuntu:${file("/home/sysad_ubuntu/.ssh/id_rsa.pub")}"
-}
+    ssh-keys = "ubuntu:${file("/home/${var.ssh_user}/.ssh/id_rsa.pub")}"
+  }
 }
 
 data "yandex_compute_image" "ubuntu_storage" {
