@@ -1,9 +1,15 @@
 ---
   el:
     hosts:
-      centos7:
+      rocky9:
         ansible_connection: docker
+
   deb:
     hosts:
-      ubuntu:
+      ubuntu-container-root:
         ansible_connection: docker
+  
+  all:
+    hosts:
+      localhosts:
+        ansible_connection: local

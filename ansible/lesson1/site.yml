@@ -8,3 +8,4 @@
       - name: Print fact
         debug:
           msg: "{{ some_fact }}"
+      
