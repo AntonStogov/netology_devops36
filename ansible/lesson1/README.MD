@@ -64,11 +64,7 @@ ansible-doc -t connection local
 
 ### 10)В prod.yml добавьте новую группу хостов с именем local, в ней разместите localhost с необходимым типом подключения.
 
-#### Ответ: 
-  all:
-    hosts:
-      localhosts:
-        ansible_connection: local
+#### Ответ:  all: hosts: localhosts: ansible_connection: local
 ---
 
 ### 11)Запустите playbook на окружении prod.yml. При запуске ansible должен запросить у вас пароль. Убедитесь, что факты some_fact для каждого из хостов определены из верных group_vars.
