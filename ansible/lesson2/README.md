@@ -4,7 +4,8 @@
 
 #### Ответ: 
 ``` 
----Yaml
+---yaml
+# inventory-файл prod.yml
 clickhouse:
   hosts:
     clickhouse-01:
