@@ -3,8 +3,8 @@
 ### 1) Подготовьте свой inventory-файл prod.yml.
 
 #### Ответ: 
-``` 
----yaml
+```yaml 
+---
 # inventory-файл prod.yml
 clickhouse:
   hosts:
