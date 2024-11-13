@@ -4,7 +4,7 @@
 
 #### Ответ: 
 ``` 
----
+---Yaml
 clickhouse:
   hosts:
     clickhouse-01:
