@@ -1,0 +1,81 @@
+---
+- name: Install Clickhouse
+  hosts: clickhouse
+  handlers:
+    - name: Start clickhouse service
+      become: true
+      ansible.builtin.service:
+        name: clickhouse-server
+        state: restarted
+
+  tasks:
+    - name: Download Clickhouse distribution packages
+      block:
+        - name: Get clickhouse distrib
+          ansible.builtin.get_url:
+            url: "https://packages.clickhouse.com/deb/pool/main/c/{{ item }}/{{ item }}_{{ clickhouse_version }}_all.deb"
+            dest: "./{{ item }}_{{ clickhouse_version }}.deb"
+            mode: '0644'  # Задаем безопасные права доступа
+          with_items: "{{ clickhouse_packages }}"
+      rescue:
+        - name: Get clickhouse common-static distrib as fallback
+          ansible.builtin.get_url:
+            url: "https://packages.clickhouse.com/deb/pool/main/c/clickhouse-common-static/clickhouse-common-static_{{ clickhouse_version }}_amd64.deb"
+            dest: "./clickhouse-common-static_{{ clickhouse_version }}.deb"
+            mode: '0644'  # Задаем безопасные права доступа
+
+    - name: Install clickhouse packages
+      become: true
+      ansible.builtin.apt:
+        deb: "./{{ item }}_{{ clickhouse_version }}.deb"
+        state: present
+      loop:
+        - clickhouse-common-static
+        - clickhouse-client
+        - clickhouse-server
+      notify: Start clickhouse service
+
+    - name: Flush handlers
+      ansible.builtin.meta: flush_handlers  # Используем FQCN для meta
+
+    - name: Create database
+      ansible.builtin.command: "clickhouse-client -q 'create database logs;'"
+      register: create_db
+      failed_when: create_db.rc != 0 and create_db.rc != 82  # Исправляем пробелы
+      changed_when: create_db.rc == 0
+
+- name: Install and configure Vector
+  hosts: clickhouse
+  handlers:
+    - name: Restart vector service
+      become: true
+      ansible.builtin.systemd:
+        name: vector
+        state: restarted
+
+  tasks:
+    - name: Download vector
+      ansible.builtin.get_url:
+        url: "https://packages.timber.io/vector/{{ vector_version }}/vector_0.40.1-1_amd64.deb"
+        dest: "/tmp/vector-{{ vector_version }}.deb"
+        mode: '0644'  # Задаем безопасные права доступа
+
+    - name: Install vector
+      become: true
+      ansible.builtin.apt:
+        deb: "/tmp/vector-{{ vector_version }}.deb"
+        state: present
+
+    - name: Deploy vector configuration
+      ansible.builtin.template:
+        src: templates/vector_config.j2
+        dest: /etc/vector/vector.toml
+        mode: '0644'  # Задаем безопасные права доступа
+      become: true
+      notify: Restart vector service
+
+    - name: Ensure vector directory exists
+      ansible.builtin.file:
+        path: /etc/vector
+        state: directory
+        mode: '0755'  # Устанавливаем безопасные права доступа

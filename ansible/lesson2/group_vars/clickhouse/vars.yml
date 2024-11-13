@@ -1,0 +1,11 @@
+---
+clickhouse_version: "22.3.3.44"
+clickhouse_packages:
+  - clickhouse-client
+  - clickhouse-server
+  - clickhouse-common-static
+
+vector_version: "0.40.1"
+vector_os_arch: "x86_64"
+vector_workdir: "/home/sysad/vector"
+vector_os_user: "sysad"

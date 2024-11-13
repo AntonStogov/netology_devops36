@@ -1,0 +1,7 @@
+---
+clickhouse:
+  hosts:
+    clickhouse-01:
+      ansible_host: "87.242.102.66"
+      ansible_user: sysad
+      
