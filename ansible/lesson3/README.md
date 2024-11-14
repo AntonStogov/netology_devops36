@@ -77,18 +77,25 @@ lighthouse:
 ---
 
 ### 5) Запустите ansible-lint site.yml и исправьте ошибки, если они есть.
-```
-```
+![image](https://github.com/user-attachments/assets/4ba5e3e4-8e3c-4fbe-9fd0-a87986a4b1de)
+![image](https://github.com/user-attachments/assets/18e6e614-dea9-40a1-9319-a1f8aee0b89a)
+
+
 ---
 
 ### 6) Попробуйте запустить playbook на этом окружении с флагом --check.
-```
-```
+![image](https://github.com/user-attachments/assets/57100732-6acb-453f-9692-4a497645e8a6)
+
+
 ---
 
 ### 7) Запустите playbook на prod.yml окружении с флагом --diff. Убедитесь, что изменения на системе произведены.
-```
-```
+![image](https://github.com/user-attachments/assets/dba57c3c-2267-442c-90b8-fb526f145528)
+![image](https://github.com/user-attachments/assets/e2f1be7a-9b3c-4252-ba2c-0b4ea726a444)
+![image](https://github.com/user-attachments/assets/b6681bc7-74d7-4e1c-aa13-e804e7882598)
+![image](https://github.com/user-attachments/assets/0ae926bc-3b2c-41a0-a27c-46ec64341967)
+
+
 ---
 
 ### 8) Повторно запустите playbook с флагом --diff и убедитесь, что playbook идемпотентен.
