@@ -1,0 +1,18 @@
+---
+clickhouse:
+  hosts:
+    clickhouse:
+      ansible_host: "176.123.166.245"
+      ansible_user: sysad
+      
+vector:
+  hosts:
+    vector:
+      ansible_host: "185.50.202.61"
+      ansible_user: sysad
+
+lighthouse:
+  hosts:
+    lighthouse:
+      ansible_host: "87.242.102.66"
+      ansible_user: sysad

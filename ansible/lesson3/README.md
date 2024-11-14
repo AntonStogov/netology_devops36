@@ -1,21 +1,78 @@
 # Домашнее задание к занятию 3 «Использование Ansible»
 ### 1) Допишите playbook: нужно сделать ещё один play, который устанавливает и настраивает LightHouse.
-```
+```yaml
+---
+- name: Lighthouse
+  hosts: lighthouse
+  gather_facts: false
+  remote_user: user
+  tags: lighthouse
+
+  handlers:
+    - name: Start Lighthouse service
+      become: true
+      ansible.builtin.systemd:
+        daemon_reload: true
+        enabled: false
+        name: nginx.service
+        state: restarted
+
+  tasks:
+    - name: Install, configure, and start Lighthouse
+      block:
+        - name: Pre-install Nginx & Git client
+          become: true
+          ansible.builtin.apt:
+            name: "{{ lighthouse_packages }}"
+            update_cache: true
+
+        - name: Clone Lighthouse source code by Git
+          become: true
+          ansible.builtin.git:
+            repo: "{{ lighthouse_code_src }}"
+            version: "{{ lighthouse_code_src_version }}"
+            dest: "{{ lighthouse_data_dir }}"
+
+        - name: Prepare nginx config
+          become: true
+          ansible.builtin.template:
+            src: "templates/lighthouse_config.j2"
+            dest: "/etc/nginx/conf.d/{{ lighthouse_nginx_conf }}"
+            mode: "0644"
+            owner: root
+            group: root
+          notify: Start Lighthouse service
 ```
 ---
 
-### 2) При создании tasks рекомендую использовать модули: `get_url`, `template`, `yum`, `apt`.
-```
-```
+### 2) При создании tasks рекомендую использовать модули: `get_url`, `template`, `yum`, `apt`. 
+Ответ: Использовал `template`, `apt` и другие.
+
 ---
 
 ### 3) Tasks должны: скачать статику LightHouse, установить Nginx или любой другой веб-сервер, настроить его конфиг для открытия LightHouse, запустить веб-сервер.
-```
-```
+Ответ: добавлен play для запуска и настройки lighthouse
 ---
 
 ### 4) Подготовьте свой inventory-файл prod.yml.
-```
+```yaml
+clickhouse:
+  hosts:
+    clickhouse:
+      ansible_host: "176.123.166.245"
+      ansible_user: sysad
+      
+vector:
+  hosts:
+    vector:
+      ansible_host: "185.50.202.61"
+      ansible_user: sysad
+
+lighthouse:
+  hosts:
+    lighthouse:
+      ansible_host: "87.242.102.66"
+      ansible_user: sysad
 ```
 ---
 
