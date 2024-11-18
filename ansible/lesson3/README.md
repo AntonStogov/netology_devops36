@@ -2,10 +2,10 @@
 ### 1) Допишите playbook: нужно сделать ещё один play, который устанавливает и настраивает LightHouse.
 ```yaml
 ---
-- name: Lighthouse
+- name: Install and configure Lighthouse
   hosts: lighthouse
   gather_facts: false
-  remote_user: user
+  remote_user: sysad
   tags: lighthouse
 
   handlers:
@@ -28,10 +28,19 @@
 
         - name: Clone Lighthouse source code by Git
           become: true
-          ansible.builtin.git:
-            repo: "{{ lighthouse_code_src }}"
-            version: "{{ lighthouse_code_src_version }}"
-            dest: "{{ lighthouse_data_dir }}"
+          block:
+            - name: Check if git repository already exists
+              ansible.builtin.stat:
+                path: "{{ lighthouse_data_dir }}/.git"
+              register: git_repo
+
+            - name: Clone Lighthouse repository
+              ansible.builtin.git:
+                repo: "{{ lighthouse_code_src }}"
+                version: "{{ lighthouse_code_src_version }}"
+                dest: "{{ lighthouse_data_dir }}"
+                force: false
+              when: not git_repo.stat.exists  # Выполняем только если репозиторий отсутствует
 
         - name: Prepare nginx config
           become: true
@@ -42,16 +51,35 @@
             owner: root
             group: root
           notify: Start Lighthouse service
+
 ```
 ---
 
 ### 2) При создании tasks рекомендую использовать модули: `get_url`, `template`, `yum`, `apt`. 
-#### Ответ: Использовал `template`, `apt` и другие.
+#### Ответ: Использовал `template`, `apt`, `systemd` и другие.
 
 ---
 
 ### 3) Tasks должны: скачать статику LightHouse, установить Nginx или любой другой веб-сервер, настроить его конфиг для открытия LightHouse, запустить веб-сервер. 
 #### Ответ: добавлен play для запуска и настройки lighthouse
+```
+server {
+    listen {{ lighthouse_nginx_port }};
+    server_name 0.0.0.0;
+
+    access_log /var/log/nginx/lighthouse-access.log;
+
+    location / {
+        root {{ lighthouse_data_dir }};
+        index index.html;
+    }
+
+    location /clickhouse {
+        proxy_pass http://176.123.166.245:8123;
+        proxy_set_header Host $host;
+    }
+}
+```
 ---
 
 ### 4) Подготовьте свой inventory-файл prod.yml.
@@ -94,17 +122,54 @@ lighthouse:
 ![image](https://github.com/user-attachments/assets/e2f1be7a-9b3c-4252-ba2c-0b4ea726a444)
 ![image](https://github.com/user-attachments/assets/b6681bc7-74d7-4e1c-aa13-e804e7882598)
 ![image](https://github.com/user-attachments/assets/0ae926bc-3b2c-41a0-a27c-46ec64341967)
+![image](https://github.com/user-attachments/assets/1236cad9-e4b1-464e-ac2d-f26c2e758aa3)
 
 
 ---
 
 ### 8) Повторно запустите playbook с флагом --diff и убедитесь, что playbook идемпотентен.
-```
-```
+![image](https://github.com/user-attachments/assets/482cdda0-f350-4089-bed8-4f261971c36b)
+![image](https://github.com/user-attachments/assets/0f099bd8-6ab0-4b48-b66d-0d7f6792f68e)
+
 ---
 
 ### 9) Подготовьте README.md-файл по своему playbook. В нём должно быть описано: что делает playbook, какие у него есть параметры и теги.
 ```
+- Параметры:
+hosts: lighthouse — Указывает, что плейбук должен выполняться на хостах, которые принадлежат группе lighthouse в инвентарном файле.
+
+gather_facts: false — Отключает сбор фактов о хостах перед выполнением задач. Это ускоряет выполнение плейбука, если факты не требуются для работы.
+
+remote_user: sysad — Используется пользователь sysad для выполнения команд на удаленных хостах.
+
+tags: lighthouse — Тег, который позволяет запускать или пропускать задачи плейбука, связанные с Lighthouse. Это полезно для фильтрации и выполнения только тех частей плейбука, которые помечены этим тегом.
+
+- Handlers:
+Start Lighthouse service — Хендлер для перезапуска сервиса Nginx после того, как будут применены изменения конфигурации.
+become: true — Привилегии суперпользователя для перезапуска сервиса.
+ansible.builtin.systemd — Используется для управления системой и сервисами. В данном случае, перезапускается сервис Nginx с настройкой daemon_reload: true, чтобы учитывать изменения в конфигурации.
+- Tasks:
+Установка и настройка Lighthouse:
+
+Pre-install Nginx & Git client — Задача для установки пакетов Nginx и Git на хостах с использованием менеджера пакетов APT.
+name: "{{ lighthouse_packages }}" — Переменная, содержащая список пакетов для установки (например, Nginx, Git).
+Клонирование исходного кода Lighthouse:
+
+Проверка существования репозитория в директории данных.
+Если репозиторий не найден, выполняется клонирование из указанного источника с использованием Ansible модуля git.
+when: not git_repo.stat.exists — Условие, которое гарантирует, что репозиторий будет клонирован только в том случае, если его еще нет в целевой директории.
+- Настройка конфигурации Nginx:
+
+Используется шаблон конфигурации lighthouse_config.j2, который копируется на хост и сохраняется в каталоге конфигурации Nginx.
+notify: Start Lighthouse service — Если задача успешна, хендлер перезапускает Nginx, чтобы применить изменения в конфигурации.
+- Переменные:
+lighthouse_packages — Переменная, содержащая список пакетов для установки (например, nginx, git).
+lighthouse_data_dir — Директория, в которой будет размещен исходный код Lighthouse, например, /var/www/lighthouse.
+lighthouse_code_src — URL репозитория Lighthouse для клонирования.
+lighthouse_code_src_version — Версия или ветка репозитория для клонирования.
+lighthouse_nginx_conf — Имя конфигурационного файла для Nginx, например, lighthouse.conf.
+- Теги:
+lighthouse — Тег, позволяющий запускать или пропускать части плейбука, относящиеся к установке и настройке Lighthouse. Теги полезны для выборочного выполнения задач, если нужно протестировать или настроить только часть плейбука.
 ```
 ---
 
