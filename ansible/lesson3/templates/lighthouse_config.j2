@@ -7,6 +7,10 @@ server {
     location / {
         root {{ lighthouse_data_dir }};
         index index.html;
+    }
 
+    location /clickhouse {
+        proxy_pass http://176.123.166.245:8123;
+        proxy_set_header Host $host;
     }
 }

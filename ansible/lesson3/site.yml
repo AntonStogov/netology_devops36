@@ -1,8 +1,8 @@
 ---
-- name: Lighthouse
+- name: Install and configure Lighthouse
   hosts: lighthouse
   gather_facts: false
-  remote_user: user
+  remote_user: sysad
   tags: lighthouse
 
   handlers:
@@ -25,10 +25,19 @@
 
         - name: Clone Lighthouse source code by Git
           become: true
-          ansible.builtin.git:
-            repo: "{{ lighthouse_code_src }}"
-            version: "{{ lighthouse_code_src_version }}"
-            dest: "{{ lighthouse_data_dir }}"
+          block:
+            - name: Check if git repository already exists
+              ansible.builtin.stat:
+                path: "{{ lighthouse_data_dir }}/.git"
+              register: git_repo
+
+            - name: Clone Lighthouse repository
+              ansible.builtin.git:
+                repo: "{{ lighthouse_code_src }}"
+                version: "{{ lighthouse_code_src_version }}"
+                dest: "{{ lighthouse_data_dir }}"
+                force: false
+              when: not git_repo.stat.exists  # Выполняем только если репозиторий отсутствует
 
         - name: Prepare nginx config
           become: true
@@ -40,50 +49,73 @@
             group: root
           notify: Start Lighthouse service
 
-- name: Install Clickhouse
+- name: Install and configure ClickHouse
   hosts: clickhouse
   handlers:
     - name: Start clickhouse service
       become: true
-      ansible.builtin.service:
+      ansible.builtin.systemd:
         name: clickhouse-server
         state: restarted
 
   tasks:
-    - name: Download Clickhouse distribution packages
+    - name: Download ClickHouse distribution packages
       block:
-        - name: Get clickhouse distrib
+        - name: Get ClickHouse distrib
           ansible.builtin.get_url:
             url: "https://packages.clickhouse.com/deb/pool/main/c/{{ item }}/{{ item }}_{{ clickhouse_version }}_all.deb"
             dest: "./{{ item }}_{{ clickhouse_version }}.deb"
-            mode: '0644'  # Задаем безопасные права доступа
+            mode: '0644'
           with_items: "{{ clickhouse_packages }}"
       rescue:
         - name: Get clickhouse common-static distrib as fallback
           ansible.builtin.get_url:
             url: "https://packages.clickhouse.com/deb/pool/main/c/clickhouse-common-static/clickhouse-common-static_{{ clickhouse_version }}_amd64.deb"
             dest: "./clickhouse-common-static_{{ clickhouse_version }}.deb"
-            mode: '0644'  # Задаем безопасные права доступа
+            mode: '0644'
 
-    - name: Install clickhouse packages
+    - name: Install ClickHouse packages
       become: true
       ansible.builtin.apt:
         deb: "./{{ item }}_{{ clickhouse_version }}.deb"
         state: present
-      loop:
-        - clickhouse-common-static
-        - clickhouse-client
-        - clickhouse-server
+      loop: "{{ clickhouse_packages }}"
       notify: Start clickhouse service
 
-    - name: Flush handlers
-      ansible.builtin.meta: flush_handlers  # Используем FQCN для meta
-
     - name: Create database
-      ansible.builtin.command: "clickhouse-client -q 'create database logs;'"
+      ansible.builtin.command: "clickhouse-client -q 'CREATE DATABASE IF NOT EXISTS logs;'"
       register: create_db
-      failed_when: create_db.rc != 0 and create_db.rc != 82  # Исправляем пробелы
+      failed_when: create_db.rc != 0 and create_db.rc != 82
       changed_when: create_db.rc == 0
+
+    - name: Create table for Vector data
+      ansible.builtin.command: >
+        clickhouse-client -q
+        "CREATE TABLE IF NOT EXISTS logs.syslog_data (
+        timestamp DateTime,
+        message String,
+        host String,
+        severity String
+        ) ENGINE = MergeTree() ORDER BY timestamp;"
+      register: create_table
+      failed_when: create_table.rc != 0 and create_table.rc != 82
+      changed_when: create_table.rc == 0
+
+    - name: Ensure ClickHouse listens on all interfaces
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/clickhouse-server/config.xml
+        regexp: '<listen_host>.*</listen_host>'
+        line: '<listen_host>0.0.0.0</listen_host>'
+        state: present
+        backup: true
+
+    - name: Restart ClickHouse server to apply changes
+      become: true
+      ansible.builtin.systemd:
+        name: clickhouse-server
+        state: restarted
+      notify: Start clickhouse service
 
 - name: Install and configure Vector
   hosts: vector
@@ -95,28 +127,29 @@
         state: restarted
 
   tasks:
-    - name: Download vector
+    - name: Download Vector
       ansible.builtin.get_url:
-        url: "https://packages.timber.io/vector/{{ vector_version }}/vector_0.40.1-1_amd64.deb"
+        url: "https://packages.timber.io/vector/{{ vector_version }}/vector_{{ vector_version }}-1_amd64.deb"
         dest: "/tmp/vector-{{ vector_version }}.deb"
-        mode: '0644'  # Задаем безопасные права доступа
+        mode: '0644'
 
-    - name: Install vector
+    - name: Install Vector
       become: true
       ansible.builtin.apt:
         deb: "/tmp/vector-{{ vector_version }}.deb"
         state: present
 
-    - name: Deploy vector configuration
-      ansible.builtin.template:
-        src: templates/vector_config.j2
-        dest: /etc/vector/vector.toml
-        mode: '0644'  # Задаем безопасные права доступа
-      become: true
-      notify: Restart vector service
-
     - name: Ensure vector directory exists
+      become: true
       ansible.builtin.file:
-        path: /etc/vector
+        path: "{{ vector_workdir }}"
         state: directory
         mode: '0755'
+
+    - name: Deploy Vector configuration
+      ansible.builtin.template:
+        src: templates/vector_config.j2
+        dest: "{{ vector_workdir }}/vector.toml"
+        mode: '0644'
+      become: true
+      notify: Restart vector service

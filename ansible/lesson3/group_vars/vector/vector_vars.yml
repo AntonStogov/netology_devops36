@@ -1,5 +1,4 @@
 ---
-
 vector_version: "0.40.1"
 vector_os_arch: "x86_64"
 vector_workdir: "/home/sysad/vector"

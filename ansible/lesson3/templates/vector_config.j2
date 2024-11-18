@@ -1,4 +1,15 @@
 # Vector Configuration
+
+# Источник данных: syslog
 [sources.syslog]
-type = "syslog"
-address = "0.0.0.0:514"
+type = "syslog"  # Тип источника
+address = "0.0.0.0:514"  # Порт для приёма syslog-сообщений
+
+# Приём данных в Clickhouse
+[sinks.clickhouse]
+type = "clickhouse"  # Тип цели
+inputs = ["syslog"]  # Источник данных для этого sink
+endpoint = "http://176.123.166.245:8123"  # Адрес Clickhouse
+database = "logs"  # База данных
+table = "syslog_data"  # Таблица для сохранения данных
+compression = "gzip"  # Компрессия
