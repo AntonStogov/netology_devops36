@@ -8,6 +8,7 @@
 - kibana;
 - filebeat.
 ```
+
 #### Logstash следует сконфигурировать для приёма по tcp json-сообщений.
 
 #### Filebeat следует сконфигурировать для отправки логов docker вашей системы в logstash.
@@ -23,6 +24,8 @@
 ```
 #### Ответ:
 
+![image](https://github.com/user-attachments/assets/0059b3c4-ab04-4168-9580-6bff82a13c95)
+
 ---
 
 ## Задание 2
@@ -33,5 +36,9 @@
 #### В манифесте директории help также приведенно dummy-приложение, которое генерирует рандомные события в stdout-контейнера. Эти логи должны порождать индекс logstash-* в elasticsearch. Если этого индекса нет — воспользуйтесь советами и источниками из раздела «Дополнительные ссылки» этого задания.
 
 #### Ответ: 
+
+![image](https://github.com/user-attachments/assets/4ac7b3df-f51d-4cd2-a2bb-e4249bc5dc0b)
+![image](https://github.com/user-attachments/assets/1f67e673-163c-43e2-96b9-b126c10c5bb5)
+
 
 ---
