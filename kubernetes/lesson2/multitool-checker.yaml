@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: Pod
-metadata:
-  name: multitool-checker
-  namespace: netology
-spec:
-  containers:
-  - name: multitool
-    image: wbitt/network-multitool
