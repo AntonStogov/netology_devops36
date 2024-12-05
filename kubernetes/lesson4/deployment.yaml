@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: network-tools
+  namespace: network-part1
+spec:
+  selector:
+    matchLabels:
+      app: nettools
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: nettools
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.25.4
+        ports:
+        - containerPort: 80
+      - name: multitool
+        image: wbitt/network-multitool
+        ports:
+        - containerPort: 1180
+        env:
+          - name: HTTP_PORT
+            value: "1180"
