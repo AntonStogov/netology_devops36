@@ -32,25 +32,29 @@ https://github.com/AntonStogov/netology_devops36/blob/main/kubernetes/lesson5/se
 
 ---
 ### 5) Предоставить манифесты Deployment и Service в решении, а также скриншоты или вывод команды п.4.
-#### Ответ: готово
+#### Ответ: готово все скриншоты и манифесты прикреплены к заданию
 
 ---
 ## Задание 2. Создать Ingress и обеспечить доступ к приложениям снаружи кластера
 ---
 ### 1) Включить Ingress-controller в MicroK8S.
-#### Ответ:
+#### Ответ: включил командой microk8s enable ingress
 
 ---
 ### 2) Создать Ingress, обеспечивающий доступ снаружи по IP-адресу кластера MicroK8S так, чтобы при запросе только по адресу открывался frontend а при добавлении /api - backend.
-#### Ответ:
+#### Ответ: создал
+https://github.com/AntonStogov/netology_devops36/blob/main/kubernetes/lesson5/ingress.yaml
 
 ---
 ### 3) Продемонстрировать доступ с помощью браузера или curl с локального компьютера.
-#### Ответ:
+#### Ответ: прикрепляю скриншоты
+![image](https://github.com/user-attachments/assets/111ea91b-2f32-4685-894e-bc328b8f3d82)
+![image](https://github.com/user-attachments/assets/4b663901-d5ba-44a8-9bf7-8e2a1d3c46a9)
+
 
 ---
 ### 4)Предоставить манифесты и скриншоты или вывод команды п.2.
-#### Ответ:
+#### Ответ: предоставил скриншоты и манифест ingress.yaml
 
 ---
 ## Правила приема работы
