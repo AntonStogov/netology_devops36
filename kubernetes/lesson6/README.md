@@ -8,23 +8,32 @@
 ---
 
 ### 1) Создать Deployment приложения, состоящего из контейнеров busybox и multitool.
-#### Ответ:
+#### Ответ: создано
+https://github.com/AntonStogov/netology_devops36/blob/main/kubernetes/lesson6/busybox.yaml
+![image](https://github.com/user-attachments/assets/a6c578de-e425-4856-9867-20e63902255b)
+
 
 ---
 ### 2) Сделать так, чтобы busybox писал каждые пять секунд в некий файл в общей директории.
-#### Ответ:
+#### Ответ: готово
+
 
 ---
 ### 3) Обеспечить возможность чтения файла контейнером multitool.
-#### Ответ:
+#### Ответ: готово
+kubectl exec -it volumes-test-6d97584b95-qwxwl -c multitool -n volume1 -- cat /testvolume/success.txt
+![image](https://github.com/user-attachments/assets/6fb171de-b578-4eb1-bb9a-724dd4375e07)
+
 
 ---
 ### 4) Продемонстрировать, что multitool может читать файл, который периодоически обновляется.
-#### Ответ:
+#### Ответ: проверяем:
+kubectl exec -it volumes-test-6d97584b95-qwxwl -c multitool -n volume1 -- tail -f /testvolume/success.txt
+![image](https://github.com/user-attachments/assets/10d45794-527f-4af1-9fc2-6e839492f156)
 
 ---
 ### 5) Предоставить манифесты Deployment в решении, а также скриншоты или вывод команды из п. 4.
-#### Ответ:
+#### Ответ: манифесты и скриншоты прикрепил ответами на вопрос.
 
 ---
 
@@ -36,19 +45,23 @@
 ---
 
 ### 1) Создать DaemonSet приложения, состоящего из multitool.
-#### Ответ:
+#### Ответ: готово
+https://github.com/AntonStogov/netology_devops36/blob/main/kubernetes/lesson6/daemonset.yaml
+![image](https://github.com/user-attachments/assets/7b0e4b99-5211-4648-88ae-22e36c33ea73)
 
 ---
 ### 2) Обеспечить возможность чтения файла /var/log/syslog кластера MicroK8S.
-#### Ответ:
+#### Ответ: готово
 
 ---
 ### 3) Продемонстрировать возможность чтения файла изнутри пода.
-#### Ответ:
+#### Ответ: выполнено
+![image](https://github.com/user-attachments/assets/48054f7f-b851-4e0b-9011-d4f094c492d9)
+
 
 ---
 ### 4) Предоставить манифесты Deployment, а также скриншоты или вывод команды из п. 2.
-#### Ответ:
+#### Ответ: выполнено, манифест и скриншоты приложил к ответам
 
 
 ---
