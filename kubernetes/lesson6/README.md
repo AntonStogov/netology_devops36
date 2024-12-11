@@ -1,12 +1,9 @@
 # Домашнее задание к занятию «Хранение в K8s. Часть 1»
 ---
 ## Задание 1
-
 ## Что нужно сделать
-
 ## Создать Deployment приложения, состоящего из двух контейнеров и обменивающихся данными.
 ---
-
 ### 1) Создать Deployment приложения, состоящего из контейнеров busybox и multitool.
 #### Ответ: создано
 https://github.com/AntonStogov/netology_devops36/blob/main/kubernetes/lesson6/busybox.yaml
