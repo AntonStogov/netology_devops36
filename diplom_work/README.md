@@ -116,5 +116,96 @@ ____
 
 # Выполнение работы
 
+## Создание облачной инфраструктуры
+
+Для выполения этой задачи буду использовать yc client и terraform
+
+![image](https://github.com/user-attachments/assets/8a20e1f8-ddbb-4dc5-8d4a-85cbd5da6512)
+
+Создаю сервисный аккаунт и даю ему права editor для внесения изменений 
+
+~~~hcl
+# Создание сервисного аккаунта
+ resource "yandex_iam_service_account" "sa" {
+   name       = var.account_name
+ }
+
+# Назначаем роль editor
+resource "yandex_resourcemanager_folder_iam_member" "sa-editor" {
+  folder_id   = var.folder_id
+  role        = "storage.editor"
+  member      = "serviceAccount:${yandex_iam_service_account.sa.id}"
+}
+
+# Создаем статический ключ доступа
+resource "yandex_iam_service_account_static_access_key" "sa-static-key" {
+ service_account_id = yandex_iam_service_account.sa.id
+ }
+
+# Используем ключ доступа для создания бакета
+resource "yandex_storage_bucket" "sa-bucket" {
+  bucket     = "bucket-for-diplom-work"
+  access_key = yandex_iam_service_account_static_access_key.sa-static-key.access_key
+  secret_key = yandex_iam_service_account_static_access_key.sa-static-key.secret_key
+
+  anonymous_access_flags {
+    read = false
+    list = false
+  }
+
+  force_destroy = true
+
+provisioner "local-exec" {
+  command = "echo export AWS_ACCESS_KEY_ID=${yandex_iam_service_account_static_access_key.sa-static-key.access_key} > ~/diplom-work/terraform/backend.tfvars"
+}
+
+provisioner "local-exec" {
+  command = "echo export AWS_SECRET_ACCESS_KEY=${yandex_iam_service_account_static_access_key.sa-static-key.secret_key} >> ~/diplom-work/terraform/backend.tfvars"
+}
+}
+~~~
+Создан сервисный аккаунт с ролью editor
+![image](https://github.com/user-attachments/assets/99506fb2-a64e-4345-809f-167f54ac145d)
+
+Создан backet 
+![image](https://github.com/user-attachments/assets/51721be9-fabd-4cdb-be17-d386c941322b)
+
+Ключ записан в файл backet.tfvars
+![image](https://github.com/user-attachments/assets/bd53c4e8-9a2d-4e3a-93bd-0abd91841c1b)
+
+---
+
+Применяю 
+~~~
+export AWS_ACCESS_KEY_ID=ИД ключа
+export AWS_SECRET_ACCESS_KEY=Мой секретный ключ
+~~~
+
+Конфигурации Terraform для создания сервисного аккаунта и бакета и основной инфраструктуры храню в разных папках.
+backend.tf
+~~~hcl
+terraform {
+  backend "s3" {
+    endpoint = "storage.yandexcloud.net"
+    bucket = "bucket-for-diplom-work"
+    region = "ru-central1"
+    key    = "for-state/terraform.tfstate"
+
+    skip_region_validation      = true
+    skip_credentials_validation = true
+  }
+}
+~~~
+
+Файл terraform.tfstate подгрузился в ранее созданный backet
+![image](https://github.com/user-attachments/assets/cbdf1fad-998e-4ef1-bc3d-5073924c9c97)
+
+
+
+
+
+
+
+
 
 
