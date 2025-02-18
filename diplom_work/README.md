@@ -224,6 +224,7 @@ resource "yandex_vpc_subnet" "diplom-subnet2" {
 ~~~
 
 Команды terraform destroy и terraform apply исполняются без дополнительных ручных действий
+
 ---
 
 ## Итог создания облачной инфраструктуры:
