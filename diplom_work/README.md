@@ -204,7 +204,7 @@ terraform {
 
 Создано VPC с подсетями в разных зонах доступности:
 
-~~~
+~~~hcl
 resource "yandex_vpc_network" "diplom" {
   name = var.vpc_name
 }
@@ -222,6 +222,9 @@ resource "yandex_vpc_subnet" "diplom-subnet2" {
   v4_cidr_blocks = var.cidr2
 }
 ~~~
+
+![image](https://github.com/user-attachments/assets/bbf9aedb-fdd4-4ebd-9be5-89f19d0595af)
+
 
 Команды terraform destroy и terraform apply исполняются без дополнительных ручных действий
 
