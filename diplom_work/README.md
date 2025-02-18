@@ -200,7 +200,36 @@ terraform {
 Файл terraform.tfstate подгрузился в ранее созданный backet
 ![image](https://github.com/user-attachments/assets/cbdf1fad-998e-4ef1-bc3d-5073924c9c97)
 
+---
 
+Создано VPC с подсетями в разных зонах доступности:
+
+~~~
+resource "yandex_vpc_network" "diplom" {
+  name = var.vpc_name
+}
+resource "yandex_vpc_subnet" "diplom-subnet1" {
+  name           = var.subnet1
+  zone           = var.zone1
+  network_id     = yandex_vpc_network.diplom.id
+  v4_cidr_blocks = var.cidr1
+}
+
+resource "yandex_vpc_subnet" "diplom-subnet2" {
+  name           = var.subnet2
+  zone           = var.zone2
+  network_id     = yandex_vpc_network.diplom.id
+  v4_cidr_blocks = var.cidr2
+}
+~~~
+
+Команды terraform destroy и terraform apply исполняются без дополнительных ручных действий
+---
+
+## Итог создания облачной инфраструктуры:
+
+Terraform сконфигурирован и создана инфраструктура посредством Terraform, без дополнительных ручных действий, стейт основной конфигурации сохраняется в бакете.
+Полученная конфигурация инфраструктуры является предварительной, поэтому в ходе дальнейшего выполнения задания будут изменения.
 
 
 
