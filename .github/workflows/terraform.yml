@@ -1,0 +1,77 @@
+name: 'Terraform CI/CD'
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'terraform/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'terraform/**'
+  workflow_dispatch:
+    inputs:
+      destroy:
+        description: 'Set to "true" to destroy infrastructure'
+        required: false
+        default: 'false'
+      apply:
+        description: 'Set to "true" to apply infrastructure changes'
+        required: false
+        default: 'false'
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+
+    env:
+      TOKEN: ${{ secrets.YC_TOKEN }}
+      CLOUD_ID: ${{ secrets.YC_CLOUD_ID }}
+      FOLDER_ID: ${{ secrets.YC_FOLDER_ID }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
+      TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
+      TF_VAR_ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+      TF_VAR_exclude_ansible: 'true'
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: "1.5.5"
+
+    - name: Terraform Init
+      run: terraform -chdir=./terraform init
+
+    - name: Terraform Format and Validate
+      run: terraform -chdir=./terraform validate
+
+    - name: Terraform Plan
+      run: |
+        terraform -chdir=./terraform plan -input=false -out=tfplan \
+        -var="token=${{ secrets.YC_TOKEN }}" \
+        -var="cloud_id=${{ secrets.YC_CLOUD_ID }}" \
+        -var="folder_id=${{ secrets.YC_FOLDER_ID }}" \
+        -var="exclude_ansible=${{ env.TF_VAR_exclude_ansible }}"
+
+    - name: Terraform Apply (Automatic Trigger)
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      run: terraform -chdir=./terraform apply -input=false tfplan
+
+    - name: Terraform Apply (Manual Trigger)
+      if: github.event_name == 'workflow_dispatch' && github.event.inputs.apply == 'true'
+      run: terraform -chdir=./terraform apply -input=false tfplan
+
+    - name: Terraform Destroy (Manual Trigger)
+      if: github.event_name == 'workflow_dispatch' && github.event.inputs.destroy == 'true'
+      run: |
+        terraform -chdir=./terraform destroy -input=false -auto-approve \
+        -var="token=${{ secrets.YC_TOKEN }}" \
+        -var="cloud_id=${{ secrets.YC_CLOUD_ID }}" \
+        -var="folder_id=${{ secrets.YC_FOLDER_ID }}"
